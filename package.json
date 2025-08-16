@@ -1,0 +1,39 @@
+{
+  "name": "scic_2025-landing_page-backend",
+  "version": "1.0.0",
+  "description": "SCIC 2025 Landing Page Backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HyuOniichan/SCIC_2025-Landing_Page-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HyuOniichan/SCIC_2025-Landing_Page-Backend/issues"
+  },
+  "homepage": "https://github.com/HyuOniichan/SCIC_2025-Landing_Page-Backend#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.1",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^24.3.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}
