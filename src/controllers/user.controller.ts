@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import userModel from "../models/user.model";
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
 class userController {
     // [GET] /user
     async index(req: Request, res: Response) {
@@ -24,107 +27,27 @@ class userController {
             })
         }
     }
-
-    // [GET] /user/me
-    async getCurrentUser(req: Request, res: Response) {
-        try {
-            const { email, id } = req.body;
-            if (!email && !id) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'User not found',
-                    errors: {
-                        server: 'No user info in token'
-                    }
-                });
-            }
-
-            const user = await userModel.findOne({ $or: [{ email }, { _id: id }] }).select('-password');
-            if (!user) {
-                return res.status(404).json({
-                    status: 'error',
-                    message: 'User not found',
-                    errors: {}
-                });
-            }
-
-            res.status(200).json({
-                status: 'success',
-                message: 'Current user fetched successfully',
-                data: user
-            });
-        } catch (e) {
-            res.status(500).json({
-                status: 'error',
-                message: 'Internal Server Error',
-                errors: { server: e }
-            });
-        }
-    }
-
-    // [POST] /user/register
-    async register(req: Request, res: Response) {
-        try {
-            const { full_name, mssv, email, password, social_links, school, major, skills } = req.body;
-
-            const existingUser = await userModel.findOne({
-                $or: [{ email }, { mssv }]
-            });
-            if (existingUser) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'User already exists',
-                    errors: {}
-                });
-            }
-
-            const hashedPassword = await require('bcryptjs').hash(password, 10);
-            const user = new userModel({ full_name, mssv, email, password: hashedPassword, social_links, school, major, skills });
-            await user.save();
-
-            res.status(201).json({
-                status: 'success',
-                message: 'User registered successfully',
-                data: { full_name, mssv, email, social_links, school, major, skills }
-            });
-        } catch (e) {
-            res.status(500).json({
-                status: 'error',
-                message: 'Internal Server Error',
-                errors: {
-                    server: e
-                }
-            });
-        }
-    }
-
+    
     // [POST] /user/login
     async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body;
 
-            const user = await userModel.findOne({ email });
-            if (!user || !user.password) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'User not found',
-                    errors: {}
-                });
-            }
+            const isMatch = (email == ADMIN_EMAIL && password == ADMIN_PASSWORD); 
 
-            const isMatch = await require('bcryptjs').compare(password, user.password);
             if (!isMatch) {
-                return res.status(400).json({
+                res.status(400).json({
                     status: 'error',
-                    message: 'Wrong password',
+                    message: 'Wrong email or password',
                     errors: {
                         server: 'Invalid credentials'
                     }
                 });
+                return; 
             }
 
             const token = require('jsonwebtoken').sign(
-                { id: user._id, email: user.email },
+                { email: email },
                 process.env.JWT_ACCESS_SECRET || 'super_secret_jwt_key',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
             );
@@ -139,16 +62,7 @@ class userController {
                 message: 'Login successful',
                 data: {
                     token,
-                    user: {
-                        id: user._id,
-                        full_name: user.full_name,
-                        mssv: user.mssv,
-                        email: user.email,
-                        social_links: user.social_links,
-                        school: user.school,
-                        major: user.major,
-                        skills: user.skills
-                    }
+                    email
                 }
             });
         } catch (e) {
