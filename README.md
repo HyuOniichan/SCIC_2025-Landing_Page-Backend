@@ -11,7 +11,7 @@ SCIC 2025 Landing Page Backend
 - API: `/api/v1/health`  
 - Method: `GET`  
 
-**Authentication**
+**Authentication**  
 - [GET] `/user` 
     - Params: `{}`
     - Responses: 
@@ -53,5 +53,111 @@ SCIC 2025 Landing Page Backend
         "status": "success",
         "message": "Logout successful",
         "data": {}
+    }
+    ```
+
+**User Connect** 
+- [GET] `/connect` 
+    - Params: `{}`
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": users
+    }
+    ```
+    - Note: Require auth
+
+- [GET] `/connect/:id` 
+    - Params: `{}`
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": user
+    }
+    ```
+    - Note: Require auth
+
+- [GET] `/connect/accepted` 
+    - Params: `{}`
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": accepted_users
+    }
+    ```
+
+- [POST] `/connect` 
+    - Params: 
+    ```json
+    { 
+        "full_name": "", 
+        "email": "", 
+        "social_links": [""], 
+        "school": "", 
+        "major": "", 
+        "skills": [""], 
+        "interests": ""
+    } 
+    ```
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": {
+            ...params, 
+            "status": "pending"
+        }
+    }
+    ```
+
+- [PATCH] `/connect/:id` 
+    - Params: 
+    ```json
+    { 
+        "status": "pending" | "accepted" | "rejected"
+    } 
+    ```
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": {
+            ...params, 
+            "status": "accepted"
+        }
+    }
+    ```
+    - Note: Require auth
+
+- [POST] `/connect` 
+    - Params: 
+    ```json
+    { 
+        "full_name": "", 
+        "email": "", 
+        "social_links": [""], 
+        "school": "", 
+        "major": "", 
+        "skills": [""], 
+        "interests": ""
+    } 
+    ```
+    - Responses: 
+    ```json
+    {
+        "status": "success",
+        "message": "Get users successfully",
+        "data": {
+            ...params, 
+            "status": "pending"
+        }
     }
     ```

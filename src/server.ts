@@ -21,7 +21,10 @@ route(app);
 // Connect to database
 mongoose.connect(db)
     .then(() => console.log("Connected to database"))
-    .catch(() => console.log("Fail to connect"))
+    .catch((e) => {
+        console.log("Fail to connect")
+        console.log(e)
+    })
 
 // Start server
 app.listen(port, () => {
