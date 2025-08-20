@@ -11,6 +11,26 @@ SCIC 2025 Landing Page Backend
 - API: `/api/v1/health`  
 - Method: `GET`  
 
+**Response**  
+- Cac response tra ve se co 2 type: 
+  - Response success: 
+    ```json
+    {
+        "status": "success", 
+        "message": string, 
+        "data": Record<string, unknown>
+    }
+    ```
+  - Response error: 
+    ```json
+    {
+        "status": "error", 
+        "message": string, 
+        "error": Record<string, string>
+    }
+    ```
+- Cac response demo o duoi mac dinh la "success"
+
 **Authentication**  
 - [GET] `/user` 
     - Params: `{}`
@@ -19,7 +39,16 @@ SCIC 2025 Landing Page Backend
     {
         "status": "success",
         "message": "Get users successfully",
-        "data": { ...usersData }
+        "data": Array<{
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
+            "status": string
+        }>
     }
     ```
     - Note: Cai nay hien dang lay data tu MongoDB Atlas, can set `MONGODB_URL` trong `.env`
@@ -28,8 +57,8 @@ SCIC 2025 Landing Page Backend
     - Params: 
     ```json
     {
-        "email": "siuno@gmail.com", 
-        "password": "matkhau"
+        "email": string, 
+        "password": string
     }  
     ```
     - Response: 
@@ -38,8 +67,8 @@ SCIC 2025 Landing Page Backend
         "status": "success",
         "message": "Login successful",
         "data": {
-            "token": "jwt_token",
-            "email": "siuno@gmail.com"
+            "token": string,
+            "email": string
         }
     }
     ```
@@ -64,10 +93,19 @@ SCIC 2025 Landing Page Backend
     {
         "status": "success",
         "message": "Get users successfully",
-        "data": users
+        "data": Array<{
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
+            "status": string
+        }>
     }
     ```
-    - Note: Require auth
+    - Note: Require auth, bi trung voi api [GET] `/user`, se deprecate trong v2 neu can
 
 - [GET] `/connect/:id` 
     - Params: `{}`
@@ -76,7 +114,16 @@ SCIC 2025 Landing Page Backend
     {
         "status": "success",
         "message": "Get users successfully",
-        "data": user
+        "data": {
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
+            "status": string
+        }
     }
     ```
     - Note: Require auth
@@ -88,7 +135,16 @@ SCIC 2025 Landing Page Backend
     {
         "status": "success",
         "message": "Get users successfully",
-        "data": accepted_users
+        "data": Array<{
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
+            "status": "accepted"
+        }>
     }
     ```
 
@@ -96,13 +152,13 @@ SCIC 2025 Landing Page Backend
     - Params: 
     ```json
     { 
-        "full_name": "", 
-        "email": "", 
-        "social_links": [""], 
-        "school": "", 
-        "major": "", 
-        "skills": [""], 
-        "interests": ""
+        "full_name": string, 
+        "email": string, 
+        "social_links": Array<string>, 
+        "school": string, 
+        "major": string, 
+        "skills": Array<string>, 
+        "interests": string
     } 
     ```
     - Responses: 
@@ -111,7 +167,13 @@ SCIC 2025 Landing Page Backend
         "status": "success",
         "message": "Get users successfully",
         "data": {
-            ...params, 
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
             "status": "pending"
         }
     }
@@ -130,7 +192,13 @@ SCIC 2025 Landing Page Backend
         "status": "success",
         "message": "Get users successfully",
         "data": {
-            ...params, 
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string,
             "status": "accepted"
         }
     }
@@ -141,13 +209,13 @@ SCIC 2025 Landing Page Backend
     - Params: 
     ```json
     { 
-        "full_name": "", 
-        "email": "", 
-        "social_links": [""], 
-        "school": "", 
-        "major": "", 
-        "skills": [""], 
-        "interests": ""
+        "full_name": string, 
+        "email": string, 
+        "social_links": Array<string>, 
+        "school": string, 
+        "major": string, 
+        "skills": Array<string>, 
+        "interests": string
     } 
     ```
     - Responses: 
@@ -156,7 +224,13 @@ SCIC 2025 Landing Page Backend
         "status": "success",
         "message": "Get users successfully",
         "data": {
-            ...params, 
+            "full_name": string, 
+            "email": string, 
+            "social_links": Array<string>, 
+            "school": string, 
+            "major": string, 
+            "skills": Array<string>, 
+            "interests": string, 
             "status": "pending"
         }
     }
