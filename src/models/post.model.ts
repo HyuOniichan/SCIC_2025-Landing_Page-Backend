@@ -1,19 +1,35 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-export interface IPost extends Document {
-    title: string, 
-    content: string, 
-    images_url: Array<string>, 
-    videos_url: Array<string>, 
+interface Media {
+  url: string;
+  fileId: string;
 }
 
-const postSchema = new Schema({
-    title: { type: String, required: true }, 
-    content: { type: String }, 
-    images_url: [{ type: String }], 
-    videos_url: [{ type: String }], 
-}, {
-    timestamps: true
-})
+export interface IPost extends Document {
+  title: string;
+  content?: string;
+  images?: Media[];
+  videos?: Media[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export default mongoose.model('Post', postSchema); 
+const mediaSchema = new Schema<Media>(
+  {
+    url: { type: String, required: true },
+    fileId: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+const postSchema = new Schema<IPost>(
+  {
+    title: { type: String, required: true },
+    content: { type: String },
+    images: [mediaSchema],
+    videos: [mediaSchema],
+  },
+  { timestamps: true }
+);
+
+export const Post = model<IPost>("Post", postSchema);
