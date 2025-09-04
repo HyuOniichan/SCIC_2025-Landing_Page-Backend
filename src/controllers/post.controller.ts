@@ -4,6 +4,7 @@ import {
   uploadFileToImageKit,
   deleteFileFromImageKit,
 } from "../utils/imagekit";
+import mongoose from "mongoose";
 
 export const getPosts = async (_req: Request, res: Response) => {
   try {
@@ -27,7 +28,7 @@ export const getPostById = async (req: Request, res: Response) => {
 export const updatePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, content, removeImages, removeVideos } = req.body;
+    let { title, content, removeImages, removeVideos } = req.body;
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
@@ -40,8 +41,15 @@ export const updatePost = async (req: Request, res: Response) => {
     post.images = post.images || [];
     post.videos = post.videos || [];
 
+    if (removeImages && !Array.isArray(removeImages)) {
+      removeImages = [removeImages];
+    }
+    if (removeVideos && !Array.isArray(removeVideos)) {
+      removeVideos = [removeVideos];
+    }
+
     // Xử lý xóa images
-    if (removeImages && Array.isArray(removeImages)) {
+    if (Array.isArray(removeImages)) {
       for (const fileId of removeImages) {
         try {
           await deleteFileFromImageKit(fileId);
@@ -55,7 +63,7 @@ export const updatePost = async (req: Request, res: Response) => {
     }
 
     // Xử lý xóa videos
-    if (removeVideos && Array.isArray(removeVideos)) {
+    if (Array.isArray(removeVideos)) {
       for (const fileId of removeVideos) {
         try {
           await deleteFileFromImageKit(fileId);
@@ -108,6 +116,9 @@ export const updatePost = async (req: Request, res: Response) => {
 
 export const createPost = async (req: Request, res: Response) => {
   try {
+    console.log("body:", req.body);
+    console.log("files:", req.files);
+
     const { title, content } = req.body;
 
     let images: { url: string; fileId: string }[] = [];
@@ -117,25 +128,21 @@ export const createPost = async (req: Request, res: Response) => {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
       if (files.images) {
-        for (const img of files.images) {
-          const uploaded = await uploadFileToImageKit(
-            img.buffer,
-            img.originalname,
-            "/posts/images"
-          );
-          images.push(uploaded);
-        }
+        const uploadedImgs = await Promise.all(
+          files.images.map((img) =>
+            uploadFileToImageKit(img.buffer, img.originalname, "/posts/images")
+          )
+        );
+        images.push(...uploadedImgs);
       }
 
       if (files.videos) {
-        for (const vid of files.videos) {
-          const uploaded = await uploadFileToImageKit(
-            vid.buffer,
-            vid.originalname,
-            "/posts/videos"
-          );
-          videos.push(uploaded);
-        }
+        const uploadedVids = await Promise.all(
+          files.videos.map((vid) =>
+            uploadFileToImageKit(vid.buffer, vid.originalname, "/posts/videos")
+          )
+        );
+        videos.push(...uploadedVids);
       }
     }
 
@@ -146,31 +153,49 @@ export const createPost = async (req: Request, res: Response) => {
   }
 };
 
-export const deletePost = async (id: string): Promise<void> => {
-  const deleted = await Post.findByIdAndDelete(id);
-  if (!deleted) throw new Error("Post not found");
+export const deletePost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
-  // Xử lý images
-  if (deleted.images?.length) {
-    for (const img of deleted.images) {
-      try {
-        await deleteFileFromImageKit(img.fileId);
-      } catch (err) {
-        console.warn(`Không tìm thấy ảnh ${img.fileId} trên ImageKit, bỏ qua.`);
+    // Kiểm tra id hợp lệ
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid post id" });
+    }
+
+    // Tìm và xóa post
+    const deleted = await Post.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Xử lý xóa images
+    if (deleted.images?.length) {
+      for (const img of deleted.images) {
+        try {
+          await deleteFileFromImageKit(img.fileId);
+        } catch {
+          console.warn(`Không tìm thấy ảnh ${img.fileId} trên ImageKit, bỏ qua.`);
+        }
       }
     }
-  }
 
-  // Xử lý videos
-  if (deleted.videos?.length) {
-    for (const vid of deleted.videos) {
-      try {
-        await deleteFileFromImageKit(vid.fileId);
-      } catch (err) {
-        console.warn(
-          `Không tìm thấy video ${vid.fileId} trên ImageKit, bỏ qua.`
-        );
+    // Xử lý xóa videos
+    if (deleted.videos?.length) {
+      for (const vid of deleted.videos) {
+        try {
+          await deleteFileFromImageKit(vid.fileId);
+        } catch {
+          console.warn(`Không tìm thấy video ${vid.fileId} trên ImageKit, bỏ qua.`);
+        }
       }
     }
+
+    return res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err: any) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ message: err.message || "Internal server error" });
   }
 };
+

@@ -25,15 +25,16 @@ router.post(
   createPost
 );
 
+
 router.get("/", getPosts);
 router.get("/:id", getPostById);
 router.put(
   "/:id",
+  authJWT,
   upload.fields([
     { name: "images", maxCount: 10 },
     { name: "videos", maxCount: 5 },
   ]),
-  authJWT,
   updatePost
 );
 router.delete("/:id", authJWT, deletePost);
