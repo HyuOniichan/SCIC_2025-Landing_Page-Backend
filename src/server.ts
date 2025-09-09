@@ -11,7 +11,10 @@ const db: string = process.env.MONGODB_URI || "";
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000", 
+      "https://scic-landing-page-fe.vercel.app"
+    ],
     credentials: true,
   })
 );
