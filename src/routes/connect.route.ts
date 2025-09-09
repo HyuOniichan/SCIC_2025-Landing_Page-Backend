@@ -3,7 +3,7 @@ import connectController from '../controllers/connect.controller';
 import { authJWT } from '../middleware/auth.middleware';
 
 const router = Router(); 
-const jsonParser = express.json()
+const jsonParser = express.json({ limit: "50mb" })
 
 router.get('/accepted', connectController.indexAccepted);
 router.get('/:id', authJWT, connectController.show);

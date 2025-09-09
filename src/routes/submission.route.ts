@@ -4,7 +4,7 @@ import multer from "multer";
 import { authJWT } from "../middleware/auth.middleware";
 
 const router = Router();
-const upload = multer();
+const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } });
 
 
 router.post(

@@ -13,7 +13,7 @@ const router = Router();
 
 // Multer setup
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
 router.post(
   "/",
@@ -24,7 +24,6 @@ router.post(
   authJWT,
   createPost
 );
-
 
 router.get("/", getPosts);
 router.get("/:id", getPostById);
